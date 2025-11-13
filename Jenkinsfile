@@ -1,5 +1,10 @@
 pipeline {
-    agent any
+    agent {
+        docker {
+            image 'maven:3.9.4-eclipse-temurin-21'  // Maven + JDK 21
+            args '-v $HOME/.m2:/root/.m2 -v /var/run/docker.sock:/var/run/docker.sock'
+        }
+    }
 
     environment {
         DOCKERHUB_CREDENTIALS = credentials('dockerhubCreds')
