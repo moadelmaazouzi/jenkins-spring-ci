@@ -1,10 +1,5 @@
 pipeline {
-    agent {
-        docker {
-            image 'maven:3.9.4-eclipse-temurin-21'  // Maven + JDK 21
-            args '-v $HOME/.m2:/root/.m2 -v /var/run/docker.sock:/var/run/docker.sock'
-        }
-    }
+    agent any
 
     environment {
         DOCKERHUB_CREDENTIALS = credentials('dockerhubCreds')
@@ -21,7 +16,7 @@ pipeline {
 
         stage('Build JAR') {
             steps {
-                sh 'mvn clean package -DskipTests'
+                sh "docker run --rm -v $PWD:/app -v $HOME/.m2:/root/.m2 -w /app maven:3.9.4-eclipse-temurin-21 mvn clean package -DskipTests"
             }
         }
 
