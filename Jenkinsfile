@@ -25,7 +25,7 @@ pipeline {
 
                             docker images
 
-                            docker run -p 9091:8080 -i test-image:latest
+                            docker run -d -p 9091:8080 --name spring-app test-image:latest
                             docker ps
 
                         """
