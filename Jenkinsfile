@@ -22,7 +22,12 @@ pipeline {
                     steps {
                         sh """
                             echo "Push de l'image Docker..."
+
                             docker images
+
+                            docker run -p 9091:8080 -i test-image:latest
+                            docker ps
+
                         """
                     }
                 }
