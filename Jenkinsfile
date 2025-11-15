@@ -24,6 +24,7 @@ pipeline {
                             echo "Push de l'image Docker..."
 
                             docker images
+                            docker rm -f spring-app
 
                             docker run -d -p 9091:8080 --name spring-app test-image:latest
                             docker ps
