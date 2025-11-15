@@ -11,4 +11,8 @@ public class TestController {
     public String getName(){
         return "this my jenkins ci cd test";
     }
+    @GetMapping("/test1")
+    public String getNameV1(){
+        return "this my jenkins ci cd test";
+    }
 }
