@@ -1,29 +1,30 @@
-# Stage 1: Build the Spring Boot application
-# FROM maven:3.8.7-jdk-21 AS build
-#WORKDIR /app
-#COPY pom.xml .
-#COPY src ./src
-#RUN mvn clean package -DskipTests
-
-# Stage 2: Create the final runtime image
-#FROM openjdk:21-jre-slim
-#WORKDIR /app
-#COPY --from=build /app/target/*.jar app.jar
-#EXPOSE 8080
-#ENTRYPOINT ["java", "-jar", "app.jar"]
-
-
-
-# Image de base avec Java 21
-FROM eclipse-temurin:21-jre
+# ---- Étape 1 : Build Maven ----
+FROM maven:3.9.9-eclipse-temurin-21 AS build
 
 # Répertoire de travail
 WORKDIR /app
 
-# Copier ton JAR compilé depuis ton machine vers le conteneur
-COPY target/*.jar app.jar
+# Copier le fichier pom.xml pour télécharger les dépendances
+COPY pom.xml .
 
-# Exposer le port de ton application
+# Télécharger les dépendances pour accélérer le build
+RUN mvn dependency:go-offline -B
+
+# Copier le code source
+COPY src ./src
+
+# Compiler le projet et générer le JAR
+RUN mvn clean package -DskipTests
+
+# ---- Étape 2 : Image finale ----
+FROM eclipse-temurin:21-jre
+
+WORKDIR /app
+
+# Copier le JAR depuis l'étape de build
+COPY --from=build /app/target/*.jar app.jar
+
+# Exposer le port
 EXPOSE 8080
 
 # Démarrer l'application
