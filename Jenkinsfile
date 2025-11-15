@@ -1,41 +1,36 @@
 pipeline {
     agent any
 
-    environment {
-        DOCKERHUB_CREDENTIALS = credentials('dockerhubCreds')
-        IMAGE_NAME = "tonDockerUser/tonImage"
-    }
-
     stages {
 
-        stage('Clone') {
+        stage('Checkout') {
             steps {
                 git branch: 'main', url: 'https://github.com/moadelmaazouzi/jenkins-spring-ci.git'
             }
         }
 
-        stage('Build JAR') {
+        stage('Build Docker Image') {
             steps {
-                sh "docker run --rm -v $PWD:/app -v $HOME/.m2:/root/.m2 -w /app maven:3.9.4-eclipse-temurin-21 mvn clean package -DskipTests"
+                sh """
+                    echo "Build de l'image Docker..."
+                    docker build -t test-image:latest .
+                """
             }
         }
 
-        stage('Build Docker image') {
-            steps {
-                sh "docker build -t ${IMAGE_NAME}:latest ."
-            }
-        }
+         stage('Push Docker Image') {
+                    steps {
+                        sh """
+                            echo "Push de l'image Docker..."
+                            docker images
+                        """
+                    }
+                }
+    }
 
-        stage('Login to Docker Hub') {
-            steps {
-                sh "echo ${DOCKERHUB_CREDENTIALS_PSW} | docker login -u ${DOCKERHUB_CREDENTIALS_USR} --password-stdin"
-            }
-        }
-
-        stage('Push image') {
-            steps {
-                sh "docker push ${IMAGE_NAME}:latest"
-            }
+    post {
+        always {
+            echo "Pipeline terminé."
         }
     }
 }
